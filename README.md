@@ -15,3 +15,10 @@ https://developer.github.com/v4/
 
 # Todoist Api Documentation
 https://developer.todoist.com/rest/v8/#overview
+
+
+# Running scripts
+To run some of the scripts, you will need API tokens. Later, we will address whether we want to do 
+nice and fancy things for this, but for now I opted for a `config.py` file. `config.py` is in the 
+`.gitignore` file, you will have to make it locally. You can see what keys are expected in the 
+`config_example.py` file.
