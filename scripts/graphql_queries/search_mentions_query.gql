@@ -1,19 +1,23 @@
 query {
-  search(query: "repo:wesleybowman/godoist in:comments mentions:wesleybowman sort:updated-desc", type: ISSUE, first:10) {
+  search(query: "repo:wesleybowman/godoist mentions:wesleybowman sort:updated-desc", type: ISSUE, first:10) {
+    # Counts are here for testing for now
     repositoryCount
     codeCount
     issueCount
     userCount
     wikiCount
+
     edges {
       node {
-        ... on Comment{
+        # TODO: remove this it doesn't seem to do anything
+        ... on Comment {
           author {
             login
           }
           body
           createdAt
-        }
+        } #end of Comment
+        
         ... on Issue {
           title
           bodyText
@@ -30,8 +34,16 @@ query {
             }
           }
           updatedAt
-        }
-      }
-    }
-  }
-}
+        } #end of Issue
+        
+        ... on PullRequest {
+          author {
+            login
+          }
+          title
+        } #end of PR
+
+      } # end of node
+    } # end of edges
+  } # end of search
+} # end of query

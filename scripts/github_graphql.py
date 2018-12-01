@@ -2,6 +2,7 @@
 An example of how to use the GitHub GraphQL API
 """
 import requests
+from pathlib import Path
 
 from config import config
 
@@ -22,25 +23,12 @@ def run_query(query):
     else:
         raise Exception(f'Query failed to run by returning code of {request.status_code}. {query}')
 
-        
-# The GraphQL query (with a few aditional bits included) itself defined as a multi-line string.       
-query = """
-query {
-  search(query:  "repo:wesleybowman/godoist author:wesleybowman", type: ISSUE, first: 10) {
-    repositoryCount
-    edges {
-      node {
-        ... on Issue {
-          bodyText
-          title
-          updatedAt
-        }
-      }
-    }
-  }
-}
-"""
+
+# Load in the search mentons query
+gql_file = Path('./scripts/graphql_queries/search_mentions_query.gql')
+with gql_file.open('r', encoding='utf-8') as f:
+    search_mentions_query = ''.join(f.readlines())
 
 # Execute the query
-result = run_query(query)
+result = run_query(search_mentions_query)
 print(f'Result: {result}')
