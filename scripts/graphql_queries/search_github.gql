@@ -1,0 +1,37 @@
+query {
+  search(query: "repo:wesleybowman/godoist in:comments mentions:wesleybowman sort:updated-desc", type: ISSUE, first:10) {
+    repositoryCount
+    codeCount
+    issueCount
+    userCount
+    wikiCount
+    edges {
+      node {
+        ... on Comment{
+          author {
+            login
+          }
+          body
+          createdAt
+        }
+        ... on Issue {
+          title
+          bodyText
+          comments(first: 10) {
+            totalCount
+            edges {
+              node{
+                body
+                createdAt
+                author {
+                  login
+                }
+              }
+            }
+          }
+          updatedAt
+        }
+      }
+    }
+  }
+}
