@@ -1,22 +1,14 @@
-query {
-  search(query: "repo:wesleybowman/godoist mentions:wesleybowman sort:updated-desc", type: ISSUE, first:10) {
-    # Counts are here for testing for now
-    repositoryCount
-    codeCount
-    issueCount
-    userCount
-    wikiCount
+query($query_string: String!) {
+  search(query: $query_string, type: ISSUE, first:10) {
+
+    pageInfo {
+      hasNextPage
+    }
 
     edges {
       node {
-        # TODO: remove this it doesn't seem to do anything
-        ... on Comment {
-          author {
-            login
-          }
-          body
-          createdAt
-        } #end of Comment
+        __typename
+        
         
         ... on Issue {
           title
@@ -27,6 +19,7 @@ query {
               node{
                 body
                 createdAt
+                updatedAt
                 author {
                   login
                 }
@@ -34,9 +27,10 @@ query {
             }
           }
           updatedAt
-        } #end of Issue
+        } # end of Issue
         
         ... on PullRequest {
+          permalink
           author {
             login
           }
