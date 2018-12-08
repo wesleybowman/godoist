@@ -1,0 +1,43 @@
+query($query_string: String!) {
+  search(query: $query_string, type: ISSUE, first:10) {
+
+    pageInfo {
+      hasNextPage
+    }
+
+    edges {
+      node {
+        __typename
+        
+        
+        ... on Issue {
+          title
+          bodyText
+          comments(first: 10) {
+            totalCount
+            edges {
+              node{
+                body
+                createdAt
+                updatedAt
+                author {
+                  login
+                }
+              }
+            }
+          }
+          updatedAt
+        } # end of Issue
+        
+        ... on PullRequest {
+          permalink
+          author {
+            login
+          }
+          title
+        } #end of PR
+
+      } # end of node
+    } # end of edges
+  } # end of search
+} # end of query
