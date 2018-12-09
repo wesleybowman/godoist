@@ -63,8 +63,26 @@ def get_mentions():
     result = load_and_run_gql_query(query_filepath)
     return result
 
+def get_requested_reviews():
+    """
+    For now, only get the mentions, and with a hardcoded query to search for
+    """
 
-def main():
+    query_filepath = './scripts/graphql_queries/review_requested.gql'
+
+    result = load_and_run_gql_query(query_filepath)
+    return result
+
+
+def get_mentions_and_requested_reviews():
+    """
+    Get my mentions and my requested reviews in one GraphQL query.
+
+    For now, this is so I can be a little more efficient (or at least, I think more efficient, not
+    100% sure that I understand GraphQL correctly) with my query. This is here until I can implement 
+    a way to make composable GraphQL queries. I think I just need to have a way to store which 
+    queries the user wants to run. Then I can compose them. That is a further down todo.
+    """
 
     query_filepath = './scripts/graphql_queries/mentions.gql'
     mentions_query = load_gql_query(query_filepath)
@@ -74,10 +92,5 @@ def main():
 
     gql_query = f'{{{mentions_query}{review_requested_query}}}'
 
-    # Execute the query
     result = run_gql_query(gql_query)
     return result
-
-
-if __name__ == '__main__':
-    result = main()
