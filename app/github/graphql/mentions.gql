@@ -5,32 +5,48 @@ mentions: search(query: "repo:wesleybowman/godoist mentions:wesleybowman sort:up
     }
     edges {
         node {
-        __typename
-        ... on Issue {
-            title
-            bodyText
-            comments(first: 10) {
-            totalCount
-            edges {
-                node {
-                body
-                createdAt
+            __typename
+            ... on Issue {
+                title
+                bodyText
                 updatedAt
-                author {
-                    login
+                url
+                comments(first: 100) {
+                    totalCount
+                    edges {
+                        node {
+                            body
+                            createdAt
+                            updatedAt
+                            url
+                            author {
+                                login
+                            }
+                        }
+                    }
                 }
+            }
+
+            ... on PullRequest {
+                title
+                bodyText
+                updatedAt
+                url
+                comments(first: 100) {
+                    totalCount
+                    edges {
+                        node {
+                            body
+                            createdAt
+                            updatedAt
+                            url
+                            author {
+                                login
+                            }
+                        }
+                    }
                 }
             }
-            }
-            updatedAt
-        }
-        ... on PullRequest {
-            permalink
-            author {
-            login
-            }
-            title
-        }
         }
     }
 }
