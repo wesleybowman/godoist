@@ -27,12 +27,12 @@ class Todoist:
 
         return resp, resp_json
 
-    def post(self, url):
+    def post(self, url, *, data):
         """
         Returns both the response and the json from the request.
         """
 
-        resp = requests.post(url, headers=self.headers)
+        resp = requests.post(url, data=data, headers=self.headers)
         resp_json = resp.json()
 
         return resp, resp_json
@@ -52,3 +52,26 @@ class Todoist:
         }
 
         return project_name_to_id_lookup
+
+    def add_task(self, data):
+        """
+        Add a task to Todoist
+
+        Example of `data`:
+            data = {
+                'content': 'Testing to Todoist 1'
+                # 'project_id': int
+                # priority
+                # due_date
+                # due_datetime
+                # due_lang
+                # label_ids
+                # order
+                # due string
+            }
+        """
+
+        url = 'https://beta.todoist.com/API/v8/tasks'
+        _, new_task = self.post(url, data=data)
+
+        return new_task
