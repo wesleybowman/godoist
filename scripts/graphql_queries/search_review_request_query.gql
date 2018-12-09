@@ -1,0 +1,28 @@
+query ($query: String!) {
+  search(query: $query, type: ISSUE, first: 100) {
+    issueCount
+    pageInfo {
+      endCursor
+      startCursor
+    }
+    edges {
+      node {
+        ... on PullRequest {
+          repository {
+            nameWithOwner
+          }
+          number
+          url
+          author{login}
+          title
+          updatedAt
+        }
+      }
+    }
+  }
+}
+
+# Query Variables
+# {
+#   "query": "type:pr state:open review-requested:wesleybowman updated:>=2018-12-07"
+# }
