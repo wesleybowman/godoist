@@ -1,0 +1,63 @@
+# Note the missing `query {}`.
+# I think if we save each gql as it's own block, it would be easily composable.
+{
+  review_requested: search(query: "type:pr state:open review-requested:wesleybowman updated:>=2018-12-07", type: ISSUE, first: 100) {
+    issueCount
+    pageInfo {
+      endCursor
+      startCursor
+    }
+    edges {
+      node {
+        ... on PullRequest {
+          repository {
+            nameWithOwner
+          }
+          number
+          url
+          author {
+            login
+          }
+          title
+          updatedAt
+        }
+      }
+    }
+  }
+
+  mentions: search(query: "repo:wesleybowman/godoist mentions:wesleybowman sort:updated-desc updated:>=2018-12-02", type: ISSUE, first: 10) {
+    pageInfo {
+      hasNextPage
+    }
+    edges {
+      node {
+        __typename
+        ... on Issue {
+          title
+          bodyText
+          comments(first: 10) {
+            totalCount
+            edges {
+              node {
+                body
+                createdAt
+                updatedAt
+                author {
+                  login
+                }
+              }
+            }
+          }
+          updatedAt
+        }
+        ... on PullRequest {
+          permalink
+          author {
+            login
+          }
+          title
+        }
+      }
+    }
+  }
+}
