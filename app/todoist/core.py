@@ -17,6 +17,12 @@ class Todoist:
             'X-Request-Id': str(uuid.uuid4()),
         }
 
+        # Todoist API urls
+        # TODO: make a `self.urls` lookup instead? 
+        self.projects_url = 'https://beta.todoist.com/API/v8/projects'
+        self.tasks_url = 'https://beta.todoist.com/API/v8/tasks'
+
+
     def get(self, url):
         """
         Returns both the response and the json from the request.
@@ -42,9 +48,7 @@ class Todoist:
         Get the lookup that maps the project name to the project id.
         """
 
-        url = 'https://beta.todoist.com/API/v8/projects'
-
-        _, projects = self.get(url)
+        _, projects = self.get(self.projects_url)
 
         project_name_to_id_lookup: Dict[str, int] = {
             project['name']: project['id'] 
@@ -69,9 +73,14 @@ class Todoist:
                 # order
                 # due string
             }
+
+        TODO: I need to come up with a way to make these results composable as well. That way the
+              user can choose how the review shows up in their task
+
+              For example, do they want anything in the task as a comment? Or just a link that will 
+              take them to the PR? For now, I will do the latter since it is easier.
         """
 
-        url = 'https://beta.todoist.com/API/v8/tasks'
-        _, new_task = self.post(url, data=data)
+        _, new_task = self.post(self.tasks_url, data=data)
 
         return new_task
