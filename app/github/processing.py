@@ -1,7 +1,6 @@
 from typing import Any, Dict, Iterator, NamedTuple
 
 from app.github.core import get_mentions, get_mentions_and_requested_reviews, get_requested_reviews
-from app.todoist.core import Todoist
 
 
 class GithubRequestedReview(NamedTuple):

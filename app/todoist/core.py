@@ -4,6 +4,8 @@ import uuid
 from typing import Dict
 
 from config import config
+from app.github.core import get_requested_reviews
+from app.github.processing import process_requested_reviews
 
 
 class Todoist:
@@ -21,6 +23,7 @@ class Todoist:
         # TODO: make a `self.urls` lookup instead? 
         self.projects_url = 'https://beta.todoist.com/API/v8/projects'
         self.tasks_url = 'https://beta.todoist.com/API/v8/tasks'
+        self.labels_url = 'https://beta.todoist.com/API/v8/labels'
 
 
     def get(self, url):
@@ -29,6 +32,8 @@ class Todoist:
         """
 
         resp = requests.get(url, headers=self.headers)
+        resp.raise_for_status()
+
         resp_json = resp.json()
 
         return resp, resp_json
@@ -38,7 +43,9 @@ class Todoist:
         Returns both the response and the json from the request.
         """
 
-        resp = requests.post(url, data=data, headers=self.headers)
+        resp = requests.post(url, data=json.dumps(data), headers=self.headers)
+        resp.raise_for_status()
+
         resp_json = resp.json()
 
         return resp, resp_json
@@ -57,7 +64,22 @@ class Todoist:
 
         return project_name_to_id_lookup
 
-    def add_task(self, data):
+    def get_labels_name_to_id_lookup(self) -> Dict[str, int]:
+        """
+        Get the lookup that maps the label name to the label id.
+        """
+
+        _, labels = self.get(self.labels_url)
+
+        label_name_to_id_lookup: Dict[str, int] = {
+            label['name']: label['id'] 
+            for label in labels
+        }
+
+        return label_name_to_id_lookup
+
+
+    def add_task(self, *, data):
         """
         Add a task to Todoist
 
@@ -84,3 +106,24 @@ class Todoist:
         _, new_task = self.post(self.tasks_url, data=data)
 
         return new_task
+
+    def add_github_requested_reviews(self) -> None:
+        """
+        """
+
+        requested_reviews = get_requested_reviews()
+        project_lookup = self.get_project_name_to_id_lookup()
+        label_lookup = self.get_labels_name_to_id_lookup()
+
+        project_id = project_lookup['Requestmachine Reviews']
+        label_id = label_lookup['godoist']
+
+        for requested_review in process_requested_reviews(requested_reviews):
+            data = {
+                'content': requested_review.url,
+                'project_id': project_id,
+                'label_ids': [label_id]
+            }
+
+            self.add_task(data=data)
+

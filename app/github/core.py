@@ -61,7 +61,7 @@ def get_mentions():
     query_filepath = './app/github/graphql_queries/mentions.gql'
 
     result = load_and_run_gql_query(query_filepath)
-    return result
+    return result['data']['mentions']
 
 def get_requested_reviews():
     """
@@ -71,7 +71,7 @@ def get_requested_reviews():
     query_filepath = './app/github/graphql/requested_reviews.gql'
 
     result = load_and_run_gql_query(query_filepath)
-    return result
+    return result['data']['requested_reviews']
 
 
 def get_mentions_and_requested_reviews():
