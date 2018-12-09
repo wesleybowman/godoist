@@ -68,7 +68,7 @@ def get_requested_reviews():
     For now, only get the mentions, and with a hardcoded query to search for
     """
 
-    query_filepath = './scripts/graphql_queries/review_requested.gql'
+    query_filepath = './scripts/graphql_queries/requested_reviews.gql'
 
     result = load_and_run_gql_query(query_filepath)
     return result
@@ -87,10 +87,10 @@ def get_mentions_and_requested_reviews():
     query_filepath = './scripts/graphql_queries/mentions.gql'
     mentions_query = load_gql_query(query_filepath)
 
-    query_filepath = './scripts/graphql_queries/review_requested.gql'
-    review_requested_query = load_gql_query(query_filepath)
+    query_filepath = './scripts/graphql_queries/requested_reviews.gql'
+    requested_reviews_query = load_gql_query(query_filepath)
 
-    gql_query = f'{{{mentions_query}{review_requested_query}}}'
+    gql_query = f'{{{mentions_query}{requested_reviews_query}}}'
 
     result = run_gql_query(gql_query)
     return result
