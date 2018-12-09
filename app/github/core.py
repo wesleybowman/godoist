@@ -58,7 +58,7 @@ def get_mentions():
     For now, only get the mentions, and with a hardcoded query to search for
     """
 
-    query_filepath = './scripts/graphql_queries/mentions.gql'
+    query_filepath = './app/github/graphql_queries/mentions.gql'
 
     result = load_and_run_gql_query(query_filepath)
     return result
@@ -68,7 +68,7 @@ def get_requested_reviews():
     For now, only get the mentions, and with a hardcoded query to search for
     """
 
-    query_filepath = './scripts/graphql_queries/requested_reviews.gql'
+    query_filepath = './app/github/graphql/requested_reviews.gql'
 
     result = load_and_run_gql_query(query_filepath)
     return result
@@ -84,10 +84,10 @@ def get_mentions_and_requested_reviews():
     queries the user wants to run. Then I can compose them. That is a further down todo.
     """
 
-    query_filepath = './scripts/graphql_queries/mentions.gql'
+    query_filepath = './app/github/graphql_queries/mentions.gql'
     mentions_query = load_gql_query(query_filepath)
 
-    query_filepath = './scripts/graphql_queries/requested_reviews.gql'
+    query_filepath = './app/github/graphql_queries/requested_reviews.gql'
     requested_reviews_query = load_gql_query(query_filepath)
 
     gql_query = f'{{{mentions_query}{requested_reviews_query}}}'
