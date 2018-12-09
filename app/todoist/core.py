@@ -118,12 +118,12 @@ class Todoist:
         project_id = project_lookup['Requestmachine Reviews']
         label_id = label_lookup['godoist']
 
+        # TODO: create a comment that holds more metadata
         for requested_review in process_requested_reviews(requested_reviews):
             data = {
-                'content': requested_review.url,
+                'content': f'[{requested_review.url}]({requested_review.title})',
                 'project_id': project_id,
                 'label_ids': [label_id]
             }
 
             self.add_task(data=data)
-
