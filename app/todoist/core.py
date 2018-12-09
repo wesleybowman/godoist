@@ -1,6 +1,7 @@
 import json
 import requests
 import uuid
+from textwrap import dedent
 from typing import Dict
 
 from config import config
@@ -21,9 +22,10 @@ class Todoist:
 
         # Todoist API urls
         # TODO: make a `self.urls` lookup instead? 
+        self.comments_url = 'https://beta.todoist.com/API/v8/comments'
+        self.labels_url = 'https://beta.todoist.com/API/v8/labels'
         self.projects_url = 'https://beta.todoist.com/API/v8/projects'
         self.tasks_url = 'https://beta.todoist.com/API/v8/tasks'
-        self.labels_url = 'https://beta.todoist.com/API/v8/labels'
 
 
     def get(self, url):
@@ -44,7 +46,12 @@ class Todoist:
         """
 
         resp = requests.post(url, data=json.dumps(data), headers=self.headers)
-        resp.raise_for_status()
+
+        try:
+            resp.raise_for_status()
+
+        except Exception:
+            print(f'response text: {resp.text}')
 
         resp_json = resp.json()
 
@@ -107,6 +114,30 @@ class Todoist:
 
         return new_task
 
+    def add_comment(self, *, data):
+        """
+        Add a task to Todoist
+
+        Example of `data`:
+            data = {
+                'content': 'Testing to Todoist 1'
+                'task_id': int
+                # either task_id or project_id is required
+                # 'project_id': int
+                # attachment
+            }
+
+        TODO: I need to come up with a way to make these results composable as well. That way the
+              user can choose how the review shows up in their task
+
+              For example, do they want anything in the task as a comment? Or just a link that will 
+              take them to the PR? For now, I will do the latter since it is easier.
+        """
+
+        _, new_comment = self.post(self.comments_url, data=data)
+
+        return new_comment
+
     def add_github_requested_reviews(self) -> None:
         """
         """
@@ -120,10 +151,30 @@ class Todoist:
 
         # TODO: create a comment that holds more metadata
         for requested_review in process_requested_reviews(requested_reviews):
-            data = {
+            task_data = {
                 'content': f'[{requested_review.url}]({requested_review.title})',
                 'project_id': project_id,
                 'label_ids': [label_id]
             }
 
-            self.add_task(data=data)
+            new_task = self.add_task(data=task_data)
+
+            new_task_id = new_task['id']
+
+            # TODO: fix here down. Currently getting a `Sync item already processed. Ignored`
+            #       Not sure what that means though.
+            content = f'''
+                Title: {requested_review.title}
+                URL: {requested_review.url}
+                author: {requested_review.author}
+                updated_at: {requested_review.updated_at}
+            '''
+
+            comment_data = {
+                'content': dedent(content),
+                'task_id': new_task_id
+            }
+
+            print(comment_data)
+
+            self.add_comment(data=comment_data)
