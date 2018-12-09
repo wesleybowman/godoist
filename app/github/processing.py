@@ -29,7 +29,7 @@ def process_mentions(mentions: Dict[str, Any]):
     """
 
 
-def process_requested_reviews(requested_reviews: Dict[str, Any]) -> Iterator:
+def process_requested_reviews(requested_reviews: Dict[str, Any]) -> Iterator[GithubRequestedReview]:
     """
     Process Requested Reviews
 
