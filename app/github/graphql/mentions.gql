@@ -1,0 +1,36 @@
+
+mentions: search(query: "repo:wesleybowman/godoist mentions:wesleybowman sort:updated-desc updated:>=2018-12-02", type: ISSUE, first: 100) {
+    pageInfo {
+        hasNextPage
+    }
+    edges {
+        node {
+        __typename
+        ... on Issue {
+            title
+            bodyText
+            comments(first: 10) {
+            totalCount
+            edges {
+                node {
+                body
+                createdAt
+                updatedAt
+                author {
+                    login
+                }
+                }
+            }
+            }
+            updatedAt
+        }
+        ... on PullRequest {
+            permalink
+            author {
+            login
+            }
+            title
+        }
+        }
+    }
+}
