@@ -84,10 +84,10 @@ def get_mentions_and_requested_reviews():
     queries the user wants to run. Then I can compose them. That is a further down todo.
     """
 
-    query_filepath = './app/github/graphql_queries/mentions.gql'
+    query_filepath = './app/github/graphql/mentions.gql'
     mentions_query = load_gql_query(query_filepath)
 
-    query_filepath = './app/github/graphql_queries/requested_reviews.gql'
+    query_filepath = './app/github/graphql/requested_reviews.gql'
     requested_reviews_query = load_gql_query(query_filepath)
 
     gql_query = f'{{{mentions_query}{requested_reviews_query}}}'
