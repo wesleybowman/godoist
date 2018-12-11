@@ -24,13 +24,13 @@ class GithubRequestedReview(NamedTuple):
 
 class Github:
 
+    graphql_url = 'https://api.github.com/graphql'
+
     def __init__(self, github_personal_access_token):
 
         self.headers = {
             'Authorization': f'Bearer {github_personal_access_token}',
         }
-
-        self.graphql_url = 'https://api.github.com/graphql'
 
     def run_gql_query(self, query: str) -> Dict[str, Any]:
         """

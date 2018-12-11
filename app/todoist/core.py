@@ -10,6 +10,12 @@ from app.github.core import Github
 
 class Todoist:
 
+    # Todoist API urls
+    comments_url = 'https://beta.todoist.com/API/v8/comments'
+    labels_url = 'https://beta.todoist.com/API/v8/labels'
+    projects_url = 'https://beta.todoist.com/API/v8/projects'
+    tasks_url = 'https://beta.todoist.com/API/v8/tasks'
+
     def __init__(self, todoist_api_token):
 
         self.headers = {
@@ -18,13 +24,6 @@ class Todoist:
             # What is `X-Request-Id`: https://stackoverflow.com/a/27174552/1141389
             'X-Request-Id': str(uuid.uuid4()),
         }
-
-        # Todoist API urls
-        # TODO: make a `self.urls` lookup instead?
-        self.comments_url = 'https://beta.todoist.com/API/v8/comments'
-        self.labels_url = 'https://beta.todoist.com/API/v8/labels'
-        self.projects_url = 'https://beta.todoist.com/API/v8/projects'
-        self.tasks_url = 'https://beta.todoist.com/API/v8/tasks'
 
     def get(self, url):
         """
@@ -101,10 +100,10 @@ class Todoist:
             }
 
         TODO: I need to come up with a way to make these results composable as well. That way the
-              user can choose how the review shows up in their task
-
+              user can choose how the review shows up in their task.
               For example, do they want anything in the task as a comment? Or just a link that will
               take them to the PR? For now, I will do the latter since it is easier.
+              I think we can take care of this with `string.Template`s
         """
 
         _, new_task = self.post(self.tasks_url, data=data)
