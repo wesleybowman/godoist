@@ -24,6 +24,7 @@ def run_gql_query(query: str) -> Dict[str, Any]:
                             json=json_data,
                             headers=HEADERS)
 
+    # TODO: take care of when we get errors since errors return a 200 as well.
     if request.status_code == 200:
         return request.json()
 
@@ -33,7 +34,7 @@ def run_gql_query(query: str) -> Dict[str, Any]:
 
 def load_gql_query(query_filepath):
     """
-    Load a gql file
+    Load a gql file.
     """
 
     gql_file = Path(query_filepath)
@@ -42,13 +43,27 @@ def load_gql_query(query_filepath):
 
     return gql_query
 
-def load_and_run_gql_query(query_filepath):
+
+def load_and_run_gql_query(query_filepath: str,
+                           *,
+                           variables: Optional[Dict[str, Any]] = None
+                           ) -> Dict[str, Any]:
     """
+    Load and run the GraphQL query.
+
+    If `variables` are supplied, then replace the `key` of the `variables` dict with it's value.
     """
 
     query = load_gql_query(query_filepath)
 
-    gql_query = f'{{{query}}}'
+    if variables:
+        # Turn GraphQL string into a Template that we can fill
+        template_query = Template(query)
+        query = template_query.safe_substitute(variables)
+
+    gql_query = f"""{{
+        {query}
+    }}"""
 
     # Execute the query
     result = run_gql_query(gql_query)
@@ -60,22 +75,12 @@ def get_mentions():
     For now, only get the mentions, and with a hardcoded query to search for
     """
 
-    query_filepath = './app/github/graphql_queries/mentions.gql'
+    query_filepath = './app/github/graphql/mentions.gql'
 
     result = load_and_run_gql_query(query_filepath)
     return result['data']['mentions']
 
 def get_requested_reviews():
-    """
-    For now, only get the mentions, and with a hardcoded query to search for
-    """
-
-    query_filepath = './app/github/graphql/requested_reviews.gql'
-
-    result = load_and_run_gql_query(query_filepath)
-    return result['data']['requested_reviews']
-
-def get_requested_reviews_2():
     """
     For now, only get the mentions, and with a hardcoded query to search for
     """
@@ -90,19 +95,8 @@ def get_requested_reviews_2():
     }
 
     query_filepath = './app/github/graphql/requested_reviews.gql'
-    gql_query = load_gql_query(query_filepath)
 
-    # Turn GraphQL string into a Template that we can fill
-    template_query = Template(gql_query)
-    query = template_query.safe_substitute(variables)
-
-    # Right now, I leave out the leading `{` and trailing `}`  from the query. I do this since it
-    # makes it possible to combine the queries first.
-    gql_query = f"""{{
-        {query}
-    }}"""
-
-    result = run_gql_query(gql_query)
+    result = load_and_run_gql_query(query_filepath, variables=variables)
     return result['data']['requested_reviews']
 
 
