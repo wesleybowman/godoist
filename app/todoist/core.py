@@ -1,6 +1,8 @@
 import json
 import requests
 import uuid
+from datetime import datetime
+from pathlib import Path
 from textwrap import dedent
 from typing import Dict
 
@@ -149,6 +151,33 @@ class Todoist:
 
         return new_comment
 
+    @staticmethod
+    def load_last_synced_date() -> str:
+        """
+        Load the last date that Todoist synced.
+        Returns a string that GitHub can use in it's searches.
+
+        Right now, I am using a file for this. I will then take this date, and use it for my GitHub
+        queries.
+        """
+        date_file = Path('app/todoist/todoist_last_sync_date.txt')
+        with date_file.open('r') as f:
+            last_sync_date = f.readline()
+
+        return last_sync_date
+
+    @staticmethod
+    def write_last_synced_date() -> None:
+        """
+        Write the last synced date to a file.
+        """
+
+        new_date = datetime.now().isoformat(timespec='seconds')
+
+        date_file = Path('app/todoist/todoist_last_sync_date.txt')
+        with date_file.open('w') as f:
+            f.write(new_date)
+
     def add_github_requested_reviews(self) -> None:
         """
         Create one task with a comment for each requested review.
@@ -192,3 +221,5 @@ class Todoist:
             print(comment_data)
 
             self.add_comment(data=comment_data)
+
+            Todoist.write_last_synced_date()
