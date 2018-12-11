@@ -1,6 +1,8 @@
 # godoist
 Could have been called Tithub or Tidbits. Maybe we change later :rofl:
 
+This application was not created by, affiliated with, or supported by Doist.
+
 # Creating the environment
 We are currently using python3.7 with conda. You can create the environment using the following commands:
 ```
