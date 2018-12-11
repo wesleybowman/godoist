@@ -5,8 +5,7 @@ from textwrap import dedent
 from typing import Dict
 
 from config import config
-from app.github.core import get_requested_reviews
-from app.github.processing import process_requested_reviews
+from app.github.core import Github
 
 
 class Todoist:
@@ -142,7 +141,9 @@ class Todoist:
         """
         """
 
-        requested_reviews = get_requested_reviews()
+        github = Github(config['GITHUB_PERSONAL_ACCESS_TOKEN'])
+        requested_reviews = github.get_requested_reviews()
+
         project_lookup = self.get_project_name_to_id_lookup()
         label_lookup = self.get_labels_name_to_id_lookup()
 
@@ -150,7 +151,7 @@ class Todoist:
         label_id = label_lookup['godoist']
 
         # TODO: create a comment that holds more metadata
-        for requested_review in process_requested_reviews(requested_reviews):
+        for requested_review in github.process_requested_reviews(requested_reviews):
             task_data = {
                 'content': f'[{requested_review.url}]({requested_review.title})',
                 'project_id': project_id,
