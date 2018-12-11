@@ -183,8 +183,11 @@ class Todoist:
         Create one task with a comment for each requested review.
         """
 
+        last_sync_date = Todoist.load_last_synced_date()
+
         github = Github(config['GITHUB_PERSONAL_ACCESS_TOKEN'])
-        requested_reviews = github.get_requested_reviews()
+        requested_reviews = github.get_requested_reviews(user_name='wesleybowman',
+                                                         last_sync_date=last_sync_date)
 
         project_lookup = self.get_project_name_to_id_lookup()
         label_lookup = self.get_labels_name_to_id_lookup()

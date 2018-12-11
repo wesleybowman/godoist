@@ -106,17 +106,13 @@ class Github:
         result = self.load_and_run_gql_query(query_filepath, variables=variables)
         return result['data']['mentions']
 
-    def get_requested_reviews(self):
+    def get_requested_reviews(self, user_name: str, last_sync_date: str) -> Dict[str, Any]:
         """
-        For now, only get the mentions, and with a hardcoded query to search for
+        Get requested reviews for a user that was updated after `last_sync_date`
         """
 
-        # TODO: get these from the parameters instead of being hardcoded.
-        user = 'wesleybowman'
-        updated = '2017-12-07'
-        query_string = f'type:pr state:open review-requested:{user} updated:>={updated}'
-        # without json.dumps, this doesn't work. We could instead add `""` to the gql file, but that
-        # is more confusing IMO
+        query_string = f'type:pr state:open review-requested:{user_name} updated:>={last_sync_date}'
+
         variables = {
             'requested_reviews_query_string': json.dumps(query_string)
         }
