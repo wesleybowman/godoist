@@ -21,8 +21,6 @@ class Todoist:
         self.headers = {
             'Authorization': f'Bearer {todoist_api_token}',
             'Content-Type': 'application/json',
-            # What is `X-Request-Id`: https://stackoverflow.com/a/27174552/1141389
-            'X-Request-Id': str(uuid.uuid4()),
         }
 
     def get(self, url):
@@ -31,7 +29,13 @@ class Todoist:
         """
 
         resp = requests.get(url, headers=self.headers)
-        resp.raise_for_status()
+
+        try:
+            resp.raise_for_status()
+
+        except requests.HTTPError as e:
+            print(f'GET request failed with error: {e}.\n'
+                  f'response text: {resp.text}')
 
         resp_json = resp.json()
 
@@ -40,15 +44,26 @@ class Todoist:
     def post(self, url, *, data):
         """
         Returns both the response and the json from the request.
+
+        Each modification request may provide additional `X-Request-Id` HTTP header that could be
+        used as an unique string to ensure modifications are applied only once - request having the
+        same id as previously seen would be discarded.
+
+        It's is not required but can be handy if you need to implement any request re-trying logic.
+
+        What is `X-Request-Id`: https://stackoverflow.com/a/27174552/1141389
         """
+
+        self.headers['X-Request-Id'] = str(uuid.uuid4())
 
         resp = requests.post(url, data=json.dumps(data), headers=self.headers)
 
         try:
             resp.raise_for_status()
 
-        except Exception:
-            print(f'response text: {resp.text}')
+        except requests.HTTPError as e:
+            print(f'POST request failed with error: {e}.\n'
+                  f'response text: {resp.text}')
 
         resp_json = resp.json()
 
@@ -136,6 +151,7 @@ class Todoist:
 
     def add_github_requested_reviews(self) -> None:
         """
+        Create one task with a comment for each requested review.
         """
 
         github = Github(config['GITHUB_PERSONAL_ACCESS_TOKEN'])
@@ -147,10 +163,9 @@ class Todoist:
         project_id = project_lookup['Requestmachine Reviews']
         label_id = label_lookup['godoist']
 
-        # TODO: create a comment that holds more metadata
         for requested_review in github.process_requested_reviews(requested_reviews):
             task_data = {
-                'content': f'[{requested_review.url}]({requested_review.title})',
+                'content': f'[{requested_review.title}]({requested_review.url})',
                 'project_id': project_id,
                 'label_ids': [label_id]
             }
@@ -159,13 +174,14 @@ class Todoist:
 
             new_task_id = new_task['id']
 
-            # TODO: fix here down. Currently getting a `Sync item already processed. Ignored`
-            #       Not sure what that means though.
             content = f'''
                 Title: {requested_review.title}
+
                 URL: {requested_review.url}
-                author: {requested_review.author}
-                updated_at: {requested_review.updated_at}
+
+                Author: {requested_review.author}
+
+                Updated_at: {requested_review.updated_at}
             '''
 
             comment_data = {

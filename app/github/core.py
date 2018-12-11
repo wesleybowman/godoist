@@ -92,6 +92,7 @@ class Github:
         """
         For now, only get the mentions, and with a hardcoded query to search for
         """
+        # TODO: get these from the parameters instead of being hardcoded.
         repo = 'wesleybowman/godoist'
         updated = '2018-12-02'
         query_string = f'repo:{repo} mentions:wesleybowman sort:updated-desc updated:>={updated}'
@@ -110,6 +111,7 @@ class Github:
         For now, only get the mentions, and with a hardcoded query to search for
         """
 
+        # TODO: get these from the parameters instead of being hardcoded.
         user = 'wesleybowman'
         updated = '2017-12-07'
         query_string = f'type:pr state:open review-requested:{user} updated:>={updated}'
@@ -136,6 +138,7 @@ class Github:
 
         # TODO: I think I can make the variables a property of the GitHub class, and then just use
         #  them as I need them
+        # TODO: get these from the parameters instead of being hardcoded.
         user = 'wesleybowman'
         updated = '2017-12-07'
         rr_query_string = f'type:pr state:open review-requested:{user} updated:>={updated}'
