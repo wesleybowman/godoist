@@ -1,0 +1,52 @@
+
+mentions: search(query: $mentions_query_string, type: ISSUE, first: 100) {
+    pageInfo {
+        hasNextPage
+    }
+    edges {
+        node {
+            __typename
+            ... on Issue {
+                title
+                bodyText
+                updatedAt
+                url
+                comments(first: 100) {
+                    totalCount
+                    edges {
+                        node {
+                            body
+                            createdAt
+                            updatedAt
+                            url
+                            author {
+                                login
+                            }
+                        }
+                    }
+                }
+            }
+
+            ... on PullRequest {
+                title
+                bodyText
+                updatedAt
+                url
+                comments(first: 100) {
+                    totalCount
+                    edges {
+                        node {
+                            body
+                            createdAt
+                            updatedAt
+                            url
+                            author {
+                                login
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
