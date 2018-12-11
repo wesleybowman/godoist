@@ -1,5 +1,5 @@
 
-mentions: search(query: "repo:wesleybowman/godoist mentions:wesleybowman sort:updated-desc updated:>=2018-12-02", type: ISSUE, first: 100) {
+mentions: search(query: $mentions_query_string, type: ISSUE, first: 100) {
     pageInfo {
         hasNextPage
     }

@@ -20,12 +20,11 @@ class Todoist:
         }
 
         # Todoist API urls
-        # TODO: make a `self.urls` lookup instead? 
+        # TODO: make a `self.urls` lookup instead?
         self.comments_url = 'https://beta.todoist.com/API/v8/comments'
         self.labels_url = 'https://beta.todoist.com/API/v8/labels'
         self.projects_url = 'https://beta.todoist.com/API/v8/projects'
         self.tasks_url = 'https://beta.todoist.com/API/v8/tasks'
-
 
     def get(self, url):
         """
@@ -64,7 +63,7 @@ class Todoist:
         _, projects = self.get(self.projects_url)
 
         project_name_to_id_lookup: Dict[str, int] = {
-            project['name']: project['id'] 
+            project['name']: project['id']
             for project in projects
         }
 
@@ -78,12 +77,11 @@ class Todoist:
         _, labels = self.get(self.labels_url)
 
         label_name_to_id_lookup: Dict[str, int] = {
-            label['name']: label['id'] 
+            label['name']: label['id']
             for label in labels
         }
 
         return label_name_to_id_lookup
-
 
     def add_task(self, *, data):
         """
@@ -105,7 +103,7 @@ class Todoist:
         TODO: I need to come up with a way to make these results composable as well. That way the
               user can choose how the review shows up in their task
 
-              For example, do they want anything in the task as a comment? Or just a link that will 
+              For example, do they want anything in the task as a comment? Or just a link that will
               take them to the PR? For now, I will do the latter since it is easier.
         """
 
@@ -129,7 +127,7 @@ class Todoist:
         TODO: I need to come up with a way to make these results composable as well. That way the
               user can choose how the review shows up in their task
 
-              For example, do they want anything in the task as a comment? Or just a link that will 
+              For example, do they want anything in the task as a comment? Or just a link that will
               take them to the PR? For now, I will do the latter since it is easier.
         """
 

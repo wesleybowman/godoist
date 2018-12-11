@@ -1,4 +1,3 @@
-
 """
 An example of how to use the GitHub GraphQL API
 """
@@ -8,10 +7,6 @@ from typing import Any, Dict, Iterator, NamedTuple, Optional
 
 import requests
 from pathlib import Path
-
-from config import config
-
-HEADERS = {"Authorization": f"Bearer {config['GITHUB_PERSONAL_ACCESS_TOKEN']}"}
 
 
 class GithubRequestedReview(NamedTuple):
@@ -97,10 +92,17 @@ class Github:
         """
         For now, only get the mentions, and with a hardcoded query to search for
         """
+        repo = 'wesleybowman/godoist'
+        updated = '2018-12-02'
+        query_string = f'repo:{repo} mentions:wesleybowman sort:updated-desc updated:>={updated}'
+
+        variables = {
+            'mentions_query_string': json.dumps(query_string)
+        }
 
         query_filepath = './app/github/graphql/mentions.gql'
 
-        result = self.load_and_run_gql_query(query_filepath)
+        result = self.load_and_run_gql_query(query_filepath, variables=variables)
         return result['data']['mentions']
 
     def get_requested_reviews(self):
@@ -126,21 +128,27 @@ class Github:
         """
         Get my mentions and my requested reviews in one GraphQL query.
 
-        For now, this is so I can be a little more efficient (or at least, I think more efficient, not
-        100% sure that I understand GraphQL correctly) with my query. This is here until I can implement 
-        a way to make composable GraphQL queries. I think I just need to have a way to store which 
-        queries the user wants to run. Then I can compose them. That is a further down todo.
+        For now, this is so I can be a little more efficient (or at least, I think more efficient,
+        not 100% sure that I understand GraphQL correctly) with my query. This is here until I can
+        implement a way to make composable GraphQL queries. I think I just need to have a way to
+        store which queries the user wants to run. Then I can compose them.
         """
-        # TODO: I think I can make the variables a property of the GitHub class, and then just use them
-        # as I need them
+
+        # TODO: I think I can make the variables a property of the GitHub class, and then just use
+        #  them as I need them
         user = 'wesleybowman'
         updated = '2017-12-07'
-        query_string = f'type:pr state:open review-requested:{user} updated:>={updated}'
+        rr_query_string = f'type:pr state:open review-requested:{user} updated:>={updated}'
+
+        repo = 'wesleybowman/godoist'
+        updated = '2018-12-02'
+        m_query_string = f'repo:{repo} mentions:wesleybowman sort:updated-desc updated:>={updated}'
+
         variables = {
-            'requested_reviews_query_string': json.dumps(query_string)
+            'mentions_query_string': json.dumps(m_query_string),
+            'requested_reviews_query_string': json.dumps(rr_query_string)
         }
 
-        # TODO: switch the mentions query over to use query variables as well.
         query_filepath = './app/github/graphql/mentions.gql'
         mentions_query = self.load_gql_query(query_filepath)
 
@@ -154,11 +162,13 @@ class Github:
             {requested_reviews_query}
         }}"""
 
+        gql_query = Template(gql_query).safe_substitute(variables)
+
         result = self.run_gql_query(gql_query)
         return result
 
-    def process_requested_reviews(self, 
-                                  requested_reviews: Dict[str, Any]
+    @staticmethod
+    def process_requested_reviews(requested_reviews: Dict[str, Any]
                                   ) -> Iterator[GithubRequestedReview]:
         """
         Process Requested Reviews
@@ -167,16 +177,16 @@ class Github:
             requested_reviews = result['data']['requested_reviews']
         """
         # TODO: I could auto get the requested review here, but I think leaving it without allows
-        # this method to be more useful.
+        #  this method to be more useful.
 
         for edge in requested_reviews['edges']:
             node = edge['node']
 
             requested_review = GithubRequestedReview(
-                url = node['url'],
-                title = node['title'],
-                author = node['author']['login'],
-                updated_at = node['updatedAt']
+                url=node['url'],
+                title=node['title'],
+                author=node['author']['login'],
+                updated_at=node['updatedAt']
             )
 
             yield requested_review
