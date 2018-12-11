@@ -2,6 +2,8 @@
 """
 An example of how to use the GitHub GraphQL API
 """
+import json
+from string import Template
 from typing import Any, Dict, Optional
 
 import requests
@@ -71,6 +73,36 @@ def get_requested_reviews():
     query_filepath = './app/github/graphql/requested_reviews.gql'
 
     result = load_and_run_gql_query(query_filepath)
+    return result['data']['requested_reviews']
+
+def get_requested_reviews_2():
+    """
+    For now, only get the mentions, and with a hardcoded query to search for
+    """
+
+    user = 'wesleybowman'
+    updated = '2017-12-07'
+    query_string = f'type:pr state:open review-requested:{user} updated:>={updated}'
+    # without json.dumps, this doesn't work. We could instead add `""` to the gql file, but that
+    # is more confusing IMO
+    variables = {
+        'requested_reviews_query_string': json.dumps(query_string)
+    }
+
+    query_filepath = './app/github/graphql/requested_reviews.gql'
+    gql_query = load_gql_query(query_filepath)
+
+    # Turn GraphQL string into a Template that we can fill
+    template_query = Template(gql_query)
+    query = template_query.safe_substitute(variables)
+
+    # Right now, I leave out the leading `{` and trailing `}`  from the query. I do this since it
+    # makes it possible to combine the queries first.
+    gql_query = f"""{{
+        {query}
+    }}"""
+
+    result = run_gql_query(gql_query)
     return result['data']['requested_reviews']
 
 
