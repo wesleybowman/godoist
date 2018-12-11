@@ -109,14 +109,29 @@ def get_mentions_and_requested_reviews():
     a way to make composable GraphQL queries. I think I just need to have a way to store which 
     queries the user wants to run. Then I can compose them. That is a further down todo.
     """
+    # TODO: I think I can make the variables a property of the GitHub class, and then just use them
+    # as I need them
+    user = 'wesleybowman'
+    updated = '2017-12-07'
+    query_string = f'type:pr state:open review-requested:{user} updated:>={updated}'
+    variables = {
+        'requested_reviews_query_string': json.dumps(query_string)
+    }
 
+    # TODO: switch the mentions query over to use query variables as well.
     query_filepath = './app/github/graphql/mentions.gql'
     mentions_query = load_gql_query(query_filepath)
 
     query_filepath = './app/github/graphql/requested_reviews.gql'
     requested_reviews_query = load_gql_query(query_filepath)
+    template = Template(requested_reviews_query)
+    requested_reviews_query = template.safe_substitute(variables)
 
-    gql_query = f'{{{mentions_query}{requested_reviews_query}}}'
+
+    gql_query = f"""{{
+        {mentions_query}
+        {requested_reviews_query}
+    }}"""
 
     result = run_gql_query(gql_query)
     return result
